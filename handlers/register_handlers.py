@@ -48,6 +48,7 @@ async def get_location(message:Message, state:FSMContext):
     await state.update_data(long = long)
     await state.update_data(lat = lat)
     data = await state.get_data()
+    await state.clear()
     await message.answer(
         text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}",
         reply_markup=action_kb
