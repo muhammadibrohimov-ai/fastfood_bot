@@ -28,3 +28,25 @@ registered_kb = ReplyKeyboardMarkup(
     resize_keyboard=True,
     one_time_keyboard=True
 )
+
+phone_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text = "Telefonni jo'natish", request_contact=True)]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+location_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text = "Location jo'natish", request_location=True)]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+action_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [InlineKeyboardButton(text = "Asosiy menuga o'tish", callback_data="action")]
+    ]
+)

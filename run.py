@@ -7,7 +7,10 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.memory import MemoryStorage
 from environs import Env
 
-from handlers import user_router, admin_router
+from handlers.user_handlers import user_router
+from handlers.admin_handlers import admin_router
+from handlers.register_handlers import register_router
+from handlers.action_handlers import action_router
 
 env = Env()
 env.read_env()
@@ -26,6 +29,8 @@ async def main():
     )
     dp.include_router(user_router)
     dp.include_router(admin_router)
+    dp.include_router(register_router)
+    dp.include_router(action_router)
     await dp.start_polling(bot,)
 
 if __name__ == "__main__":
