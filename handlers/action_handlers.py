@@ -5,3 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 action_router = Router()
+
+@action_router.message(F.data.in_(['action']))
+async def start_action(callback:CallbackQuery):
+    pass

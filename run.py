@@ -31,7 +31,7 @@ async def main():
     dp.include_router(admin_router)
     dp.include_router(register_router)
     dp.include_router(action_router)
-    await dp.start_polling(bot,)
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

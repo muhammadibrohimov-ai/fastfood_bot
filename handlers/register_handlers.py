@@ -4,6 +4,8 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
+from .check import check_phone
+
 from .buttons import phone_kb, location_kb, action_kb
 
 register_router = Router()
@@ -33,13 +35,34 @@ async def get_fullname(message:Message, state:FSMContext):
 
 @register_router.message(Register.phone)
 async def get_phone(message:Message, state:FSMContext):
-    text = message.contact.phone_number
-    await state.update_data(phone = text)
-    await state.set_state(Register.loaction)
-    await message.answer(
-        text = "Location jo'nating: ",
-        reply_markup=location_kb
-    )
+    if message.contact:
+        text = message.contact.phone_number
+        
+        await state.update_data(phone = text)
+        await state.set_state(Register.loaction)
+        await message.answer(
+            text = "Location jo'nating: ",
+            reply_markup=location_kb
+        )
+        
+    else:
+        text = message.text
+        status = await check_phone(text)
+        
+        if not status:
+            await message.answer(
+                text = "Telefon raqamingizni qayta yuboring: ",
+                reply_markup=phone_kb
+            )
+        else:
+            await state.update_data(phone = text)
+            await state.set_state(Register.loaction)
+            await message.answer(
+                text = "Location jo'nating: ",
+                reply_markup=location_kb
+            )
+
+    
     
 @register_router.message(Register.loaction)
 async def get_location(message:Message, state:FSMContext):
