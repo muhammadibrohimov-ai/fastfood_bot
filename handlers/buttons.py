@@ -45,8 +45,19 @@ location_kb = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
-action_kb = InlineKeyboardMarkup(
+action_ikb = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text = "Asosiy menuga o'tish", callback_data="action")]
     ]
+)
+
+action_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Menu")],
+        [KeyboardButton(text="Buyurtmalar")],
+        [KeyboardButton(text="Aloqa")],
+        [KeyboardButton(text='Sozlamalar')]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True,
 )

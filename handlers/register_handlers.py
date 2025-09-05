@@ -4,9 +4,9 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from .check import check_phone
+from .check import check_phone, location_check
 
-from .buttons import phone_kb, location_kb, action_kb
+from .buttons import phone_kb, location_kb, action_ikb
 
 register_router = Router()
 
@@ -37,42 +37,56 @@ async def get_fullname(message:Message, state:FSMContext):
 async def get_phone(message:Message, state:FSMContext):
     if message.contact:
         text = message.contact.phone_number
+        status = True
         
+    else:
+        text = message.text
+        status = await check_phone(text)
+        
+    if not status:
+        await message.answer(
+            text = "Telefon raqamingizni qayta yuboring: ",
+            reply_markup=phone_kb
+        )
+    else:
         await state.update_data(phone = text)
         await state.set_state(Register.loaction)
         await message.answer(
             text = "Location jo'nating: ",
             reply_markup=location_kb
         )
-        
-    else:
-        text = message.text
-        status = await check_phone(text)
-        
-        if not status:
-            await message.answer(
-                text = "Telefon raqamingizni qayta yuboring: ",
-                reply_markup=phone_kb
-            )
-        else:
-            await state.update_data(phone = text)
-            await state.set_state(Register.loaction)
-            await message.answer(
-                text = "Location jo'nating: ",
-                reply_markup=location_kb
-            )
 
     
     
 @register_router.message(Register.loaction)
 async def get_location(message:Message, state:FSMContext):
-    long = message.location.longitude
-    lat = message.location.latitude
-    await state.update_data(long = long)
-    await state.update_data(lat = lat)
-    data = await state.get_data()
-    await state.clear()
-    await message.answer(
-        text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}",
-        reply_markup=action_kb
-    )
+    status_1 = True
+    status_2 = True
+    status_3 = True
+    if message.forward_origin:
+        status_1 = False
+    
+    try:
+            long = message.location.longitude
+            lat = message.location.latitude
+    except:
+        status_2 = False
+    
+    status_3 = await location_check(latitude=lat, longitude=long)
+
+    if not (status_1 and status_2 and status_3):
+        await message.answer(
+            text = "Location qayta jo'nating: ",
+            reply_markup=location_kb
+        )
+    else:
+        await state.update_data(long = long)
+        await state.update_data(lat = lat)
+        data = await state.get_data()
+        await state.clear()
+        await message.answer(
+            text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}",
+            reply_markup=action_ikb
+        )
+        
+        
