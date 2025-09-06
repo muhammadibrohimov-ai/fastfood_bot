@@ -15,8 +15,6 @@ async def cmd_start(message:Message, state:FSMContext):
     user = message.from_user
     data = get_users(user.id)
     if not data:
-        await state.update_data(chat_id = message.from_user.id)
-        await state.update_data(username = message.from_user.username)
         await message.answer(
             text = '''🍔 FastFood Botga xush kelibsiz! 🚀
 

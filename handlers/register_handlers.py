@@ -6,7 +6,8 @@ from aiogram.fsm.state import StatesGroup, State
 
 from .check import check_phone, location_check
 
-from .buttons import phone_kb, location_kb, action_ikb
+from .buttons import phone_kb, location_kb, action_ikb, register_kb
+from database import add_to_table
 
 register_router = Router()
 
@@ -19,6 +20,8 @@ class Register(StatesGroup):
 @register_router.message(F.text == "Register")
 async def start_register(message:Message, state:FSMContext):
     await state.set_state(Register.fullname)
+    await state.update_data(chat_id = message.from_user.id)
+    await state.update_data(username = message.from_user.username)
     await message.answer(
         text = "F.I.Sh kiritng: "
     )
@@ -84,9 +87,14 @@ async def get_location(message:Message, state:FSMContext):
         await state.update_data(lat = lat)
         data = await state.get_data()
         await state.clear()
-        await message.answer(
-            text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}",
-            reply_markup=action_ikb
-        )
         
-        
+        if add_to_table('users', chat_id=data['chat_id'], username = data['username'], fullname=data['fullname'], long = data['long'], lat = data['lat']):
+            await message.answer(
+                text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}",
+                reply_markup=action_ikb
+            )
+        else:
+            await message.answer(
+                text = 'Xatolik yuz berdi , iltimos qayta urining!',
+                reply_markup=register_kb
+            )

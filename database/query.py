@@ -8,12 +8,17 @@ def get_users(chat_id):
             return dbc.fetchone()
 
 def add_to_table(table_name, **kwargs):
+    keys = ', '.join(kwargs.keys())
+    placeholders = ', '.join(['%s'] * len(kwargs))
+    values = tuple(kwargs.values())
 
-    print("Run:", id(kwargs), kwargs.keys())
+    query = f"INSERT INTO {table_name} ({keys}) VALUES ({placeholders});"
 
-chat_id=185, 
-fullname="Muhammadjon", 
-username='mlkj', 
-phone='+56299', 
-long='40.215', 
-lat='163.254'
+    try:
+        with get_connection() as db:
+            with db.cursor() as dbc:
+                dbc.execute(query, values)
+                return True
+    except Exception as e:
+        print(f"Error inserting into {table_name}: {e}")
+        return False
