@@ -1,10 +1,17 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import (
+    Message, 
+    CallbackQuery, 
+    FSInputFile, 
+    InputMediaPhoto
+)
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from .buttons import action_kb
+from .buttons import action_kb, inline_keyboard_menu, one_food_inline_button
+from database import get_specific_food
+
 
 action_router = Router()
 
@@ -15,3 +22,23 @@ async def start_action(callback:CallbackQuery):
         reply_markup= action_kb,
     )
     await callback.answer()
+    
+@action_router.message(F.text == "Menu")
+async def show_menu(message:Message):
+    await message.answer_photo(
+        photo="https://icebergdriveinn.com/cdn/shop/articles/Fast-Food-How-It-Has-Evolved-in-the-Past-Decades.jpg?v=1625683335",
+        caption = "Iltimos kerakli fast food ni tanlang",
+        reply_markup=await inline_keyboard_menu()
+    )
+    
+@action_router.callback_query(F.data.startswith('food'))
+async def show_one_food(callback:CallbackQuery):
+    id = int(callback.data.split('_')[1])
+    food = get_specific_food(id)
+    print(food)
+    image = FSInputFile(food[2])
+    media = InputMediaPhoto(media=image, caption=f'Bu {food[1]}')
+    await callback.message.edit_media(media=media)
+    await callback.message.edit_reply_markup(reply_markup=await one_food_inline_button())
+    
+

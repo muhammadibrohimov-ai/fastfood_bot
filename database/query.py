@@ -22,3 +22,15 @@ def add_to_table(table_name, **kwargs):
     except Exception as e:
         print(f"Error inserting into {table_name}: {e}")
         return False
+
+def get_foods():
+    with get_connection() as db:
+        with db.cursor() as dbc:
+            dbc.execute("SELECT * FROM foods;")
+            return dbc.fetchall()
+        
+def get_specific_food(id):
+    with get_connection() as db:
+        with db.cursor() as dbc:
+            dbc.execute(f'SELECT * FROM foods WHERE id = {id};')
+            return dbc.fetchone()

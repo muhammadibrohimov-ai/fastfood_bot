@@ -10,6 +10,8 @@ from aiogram.utils.keyboard import (
     ReplyKeyboardBuilder
 )
 
+from database import get_foods
+
 register_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text='Register')]
@@ -61,3 +63,25 @@ action_kb = ReplyKeyboardMarkup(
     resize_keyboard=True,
     one_time_keyboard=True,
 )
+
+async def inline_keyboard_menu():
+    keyboard = InlineKeyboardBuilder()
+    
+    for i in get_foods():
+        keyboard.add(InlineKeyboardButton(text = i[1], callback_data=f'food_{i[0]}'))
+        
+    return keyboard.adjust(2).as_markup()
+    
+    
+async def one_food_inline_button(i:int = 0) :
+    keyboard= InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text = '-', callback_data=f'method_1'), 
+                InlineKeyboardButton(text = f'{0+i}', callback_data = 'method_3'), 
+                InlineKeyboardButton(text = '+', callback_data=f'method_2')
+            ],
+            [InlineKeyboardButton(text = 'Savatga qo\'shish', callback_data = "order")]
+        ]
+        )   
+    return keyboard
