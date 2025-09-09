@@ -40,5 +40,9 @@ async def show_one_food(callback:CallbackQuery):
     media = InputMediaPhoto(media=image, caption=f'Bu {food[1]}')
     await callback.message.edit_media(media=media)
     await callback.message.edit_reply_markup(reply_markup=await one_food_inline_button())
+    await callback.answer()
     
 
+# @action_router.message()
+# async def nothng(message:Message):
+#     await message.answer(f"{message.from_user.id}")

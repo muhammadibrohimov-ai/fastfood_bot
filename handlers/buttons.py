@@ -85,3 +85,29 @@ async def one_food_inline_button(i:int = 0) :
         ]
         )   
     return keyboard
+
+admin_kb = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text = "Taom qo'shish")],
+        [KeyboardButton(text = "Xabarlar")],
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+add_foods = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text = "Yangi taom qo'shish", callback_data="new_food"), 
+            InlineKeyboardButton(text = 'Mavjud taomni qo\'shish', callback_data="existing_food")
+        ]
+    ]
+)
+
+async def inline_keyboard_foods():
+    keyboard = InlineKeyboardBuilder()
+    
+    for i in get_foods():
+        keyboard.add(InlineKeyboardButton(text = i[1], callback_data=f'existing-food_{i[0]}'))
+        
+    return keyboard.adjust(2).as_markup()
