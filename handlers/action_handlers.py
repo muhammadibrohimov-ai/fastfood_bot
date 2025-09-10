@@ -46,6 +46,32 @@ async def show_one_food(callback:CallbackQuery):
     await callback.answer()
     
 
+@action_router.callback_query(F.data.startswith('minus'))
+async def minus_food(callback:CallbackQuery):
+    quantity = int(callback.data.split('_')[1])
+    quantity -= 1
+    if quantity >= 1:
+        await callback.message.edit_reply_markup(reply_markup=await one_food_inline_button(quantity))
+    else:
+        await callback.answer("Taom soni 1 dan kam bo'lmaydi!!!")
+        
+        
+        
+@action_router.callback_query(F.data.startswith('plus'))
+async def plus_food(callback:CallbackQuery):
+    quantity = int(callback.data.split('_')[1])
+    quantity += 1
+    if quantity <= 10:
+        await callback.message.edit_reply_markup(reply_markup=await one_food_inline_button(quantity))
+    else:
+        await callback.answer("Taom soni 10 dan ko'p bo'lmaydi!!!")
+
+    
+    
+@action_router.callback_query(F.data == 'back')
+async def back_to_menu(callback:CallbackQuery):
+    pass
+    
 # @action_router.message()
 # async def nothng(message:Message):
 #     await message.answer(f"{message.from_user.id}")

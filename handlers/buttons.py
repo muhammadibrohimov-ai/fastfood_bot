@@ -73,18 +73,24 @@ async def inline_keyboard_menu():
     return keyboard.adjust(2).as_markup()
     
     
-async def one_food_inline_button(i:int = 0) :
+    
+async def one_food_inline_button(i:int = 1) :
     keyboard= InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text = '-', callback_data=f'method_1'), 
-                InlineKeyboardButton(text = f'{0+i}', callback_data = 'method_3'), 
-                InlineKeyboardButton(text = '+', callback_data=f'method_2')
+                InlineKeyboardButton(text = '-', callback_data=f'minus_{i}'), 
+                InlineKeyboardButton(text = f'{i}', callback_data = 'nothing'), 
+                InlineKeyboardButton(text = '+', callback_data=f'plus_{i}')
             ],
-            [InlineKeyboardButton(text = 'Savatga qo\'shish', callback_data = "order")]
+            [
+                InlineKeyboardButton(text = "Ortga qaytish", callback_data = "back"),
+                InlineKeyboardButton(text = 'Savatga qo\'shish', callback_data = "order")
+            ]
         ]
         )   
     return keyboard
+
+
 
 admin_kb = ReplyKeyboardMarkup(
     keyboard=[
