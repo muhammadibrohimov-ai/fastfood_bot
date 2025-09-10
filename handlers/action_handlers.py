@@ -36,8 +36,11 @@ async def show_one_food(callback:CallbackQuery):
     id = int(callback.data.split('_')[1])
     food = get_specific_food(id)
     print(food)
-    image = FSInputFile(food[2])
-    media = InputMediaPhoto(media=image, caption=f'Bu {food[1]}')
+    if food[2].startswith("AgACAgIAAxkBAA"):  
+        media = InputMediaPhoto(media=food[2], caption=f'Bu {food[1]}')
+    else:
+        image = FSInputFile(food[2])
+        media = InputMediaPhoto(media=image, caption=f'Bu {food[1]}')
     await callback.message.edit_media(media=media)
     await callback.message.edit_reply_markup(reply_markup=await one_food_inline_button())
     await callback.answer()
