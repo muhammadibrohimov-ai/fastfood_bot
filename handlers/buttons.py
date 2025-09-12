@@ -74,20 +74,33 @@ async def inline_keyboard_menu():
     
     
     
-async def one_food_inline_button(i:int = 1) :
+async def one_food_inline_button(food_id ,i:int = 1) :
     keyboard= InlineKeyboardMarkup(
         inline_keyboard=[
             [
-                InlineKeyboardButton(text = '-', callback_data=f'minus_{i}'), 
+                InlineKeyboardButton(text = '-', callback_data=f'minus_{i}_{food_id}'), 
                 InlineKeyboardButton(text = f'{i}', callback_data = 'nothing'), 
-                InlineKeyboardButton(text = '+', callback_data=f'plus_{i}')
+                InlineKeyboardButton(text = '+', callback_data=f'plus_{i}_{food_id}')
             ],
             [
-                InlineKeyboardButton(text = "Ortga qaytish", callback_data = "back"),
-                InlineKeyboardButton(text = 'Savatga qo\'shish', callback_data = "order")
+                InlineKeyboardButton(text = "Ortga qaytish", callback_data = f"back_{food_id}"),
+                InlineKeyboardButton(text = 'Savatga qo\'shish', callback_data = f"order_{i}_{food_id}")
             ]
         ]
         )   
+    return keyboard
+
+
+async def send_cancel_food(quantity, food_id):
+    keyboard = InlineKeyboardMarkup(
+                    inline_keyboard=[
+                        [
+                            InlineKeyboardButton(text = "CANCEL", callback_data=f"back_{quantity}_{food_id}"), 
+                            InlineKeyboardButton(text = 'SEND', callback_data=f"send_{quantity}_{food_id}")
+                        ]
+                    ]
+                )
+    
     return keyboard
 
 

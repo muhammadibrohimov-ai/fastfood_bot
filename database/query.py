@@ -34,3 +34,13 @@ def get_specific_food(id):
         with db.cursor() as dbc:
             dbc.execute(f'SELECT * FROM foods WHERE id = {id};')
             return dbc.fetchone()
+        
+def change_table(query):
+    try:
+        with get_connection() as db:
+            with db.cursor() as dbc:
+                dbc.execute(query)
+                db.commit()
+        return True
+    except Exception as e:
+        return e
