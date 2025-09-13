@@ -108,7 +108,9 @@ async def send_cancel_food(quantity, food_id):
 admin_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text = "Taom qo'shish")],
+        [KeyboardButton(text = "Buyurtmalar")],
         [KeyboardButton(text = "Xabarlar")],
+        [KeyboardButton(text = "User panelga qaytish")]
     ],
     resize_keyboard=True,
     one_time_keyboard=True
@@ -130,3 +132,26 @@ async def inline_keyboard_foods():
         keyboard.add(InlineKeyboardButton(text = i[1], callback_data=f'existing-food_{i[0]}'))
         
     return keyboard.adjust(2).as_markup()
+
+order_show = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text = "🆕New"),
+            KeyboardButton(text = "In progress"),
+            KeyboardButton(text = "Finished")
+        ]
+    ], 
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+async def order_inline_kb(order_id:int, i:int = 1):
+
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text = '❌Cancel', callback_data=f'cancel_{order_id}'),
+                InlineKeyboardButton(text = f"{'In progress' if i==1 else  'Finish'}", callback_data=f"{'progress' if i==1 else 'finish'}_{order_id}")
+            ]
+        ]
+    )

@@ -43,4 +43,17 @@ def change_table(query):
                 db.commit()
         return True
     except Exception as e:
-        return e
+        print(e)
+        return False
+    
+def get_order_food(status : str):
+    try:
+        with get_connection() as db:
+            with db.cursor() as dbc:
+                dbc.execute(f"SELECT o.id AS order_id, f.name AS food_name, u.id AS user_id, f.price AS food_price, o.quantity AS order_quantity, (o.quantity * f.price) AS total_price FROM orders o JOIN foods f ON o.food_id = f.id JOIN users u ON o.user_id = u.id WHERE status = '{status}';")
+                data = dbc.fetchall()
+        return data
+    except Exception as e:
+        print(e)
+        return None
+

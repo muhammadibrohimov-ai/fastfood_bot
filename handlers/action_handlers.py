@@ -38,11 +38,7 @@ async def show_one_food(callback:CallbackQuery):
     id = int(callback.data.split('_')[1])
     food = get_specific_food(id)
     print(food)
-    if food[2].startswith("AgACAgIAAxkBAA"):  
-        media = InputMediaPhoto(media=food[2], caption=f'Bu {food[1]}')
-    else:
-        image = FSInputFile(food[2])
-        media = InputMediaPhoto(media=image, caption=f'Bu {food[1]}')
+    media = InputMediaPhoto(media=food[2], caption=f'{food[-1]}')
     await callback.message.edit_media(media=media)
     await callback.message.edit_reply_markup(reply_markup=await one_food_inline_button(id))
     await callback.answer()
@@ -100,16 +96,15 @@ async def send_to_db(callback:CallbackQuery):
         await callback.message.delete()
         
         await callback.message.answer(
-            text="Iltimos kerakli buyruqni tanlang:",
+            text="Success!!!\nIltimos kerakli buyruqni tanlang:",
             reply_markup=action_kb
         )
         
-        await asyncio.sleep(3)
+    
+    
         
-        print(change_table(f"UPDATE orders SET status = 'finished' WHERE user_id = {user_id}"))
     
-    
-@action_router.callback_query(F.startswith('back'))
+@action_router.callback_query(F.data.startswith('back'))
 async def back_to_menu(callback: CallbackQuery):
     await callback.message.edit_reply_markup(reply_markup=None)
 
