@@ -70,15 +70,15 @@ CREATE TABLE IF NOT EXISTS comments(
 );'''
 
 
-# for table in [users, foods, orders, comments]:
-#     with get_connection() as db:
-#         dbc = db.cursor()
-#         dbc.execute(table)
-#         db.commit() 
+for table in [users, foods, orders, comments]:
+    with get_connection() as db:
+        dbc = db.cursor()
+        dbc.execute(table)
+        db.commit() 
 
 
-# with get_connection() as db:
-#         dbc = db.cursor()
-#         dbc.execute("DELETE FROM users")
-#         db.commit() 
+with get_connection() as db:
+        dbc = db.cursor()
+        dbc.execute("DELETE FROM users")
+        db.commit() 
         
