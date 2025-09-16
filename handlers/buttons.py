@@ -67,8 +67,12 @@ action_kb = ReplyKeyboardMarkup(
 async def inline_keyboard_menu():
     keyboard = InlineKeyboardBuilder()
     
-    for i in get_foods():
-        keyboard.add(InlineKeyboardButton(text = i[1], callback_data=f'food_{i[0]}'))
+    if get_foods():
+        for i in get_foods():
+            keyboard.add(InlineKeyboardButton(text = i[1], callback_data=f'food_{i[0]}'))
+            
+    else:
+        keyboard.add(InlineKeyboardButton(text = "Hozircha ovqat mavjud emas, ortga qayting", callback_data='main'))
         
     return keyboard.adjust(2).as_markup()
     
@@ -107,7 +111,7 @@ async def send_cancel_food(quantity, food_id):
 
 admin_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text = "Taom qo'shish")],
+        [KeyboardButton(text = "Taomlar")],
         [KeyboardButton(text = "Buyurtmalar")],
         [KeyboardButton(text = "Xabarlar")],
         [KeyboardButton(text = "User panelga qaytish")]
@@ -125,11 +129,12 @@ add_foods = InlineKeyboardMarkup(
     ]
 )
 
-async def inline_keyboard_foods():
+async def inline_keyboard_foods(food_id):
+    features = ['name', 'price', 'image', 'quantity', 'description']
     keyboard = InlineKeyboardBuilder()
     
-    for i in get_foods():
-        keyboard.add(InlineKeyboardButton(text = i[1], callback_data=f'existing-food_{i[0]}'))
+    for i in features:
+        keyboard.add(InlineKeyboardButton(text = i, callback_data=f'edit_{food_id}_{features.index(i)}'))
         
     return keyboard.adjust(2).as_markup()
 

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone    VARCHAR(100) UNIQUE,
     long     VARCHAR(50),
     lat      VARCHAR(50),
+    location_link VARCHAR(180),
     is_admin INTEGER NOT NULL,
     UNIQUE(chat_id),
     UNIQUE(phone)
@@ -63,10 +64,9 @@ CREATE TABLE IF NOT EXISTS orders (
 comments = '''
 CREATE TABLE IF NOT EXISTS comments(
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id    INTEGER NOT NULL,
+    chat_id    INTEGER NOT NULL,
     comment    TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );'''
 
 
@@ -74,5 +74,11 @@ CREATE TABLE IF NOT EXISTS comments(
 #     with get_connection() as db:
 #         dbc = db.cursor()
 #         dbc.execute(table)
+#         db.commit() 
+
+
+# with get_connection() as db:
+#         dbc = db.cursor()
+#         dbc.execute("DELETE FROM users")
 #         db.commit() 
         

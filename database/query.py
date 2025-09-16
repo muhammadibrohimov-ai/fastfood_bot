@@ -76,3 +76,17 @@ def get_user_order(user_id:int):
         print(e)
         return None
         
+        
+def add_comment(chat_id, comment):
+    try:
+        with get_connection() as db:
+            dbc = db.cursor()
+            dbc.execute("INSERT INTO comments (chat_id, coment) VALUES (?, ?)", (str(chat_id), str(comment)))
+            
+            db.commit()
+            
+        return True
+    
+    except Exception as e:
+        print(e)
+        return False

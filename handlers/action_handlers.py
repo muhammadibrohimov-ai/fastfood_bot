@@ -12,11 +12,15 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 from .buttons import action_kb, inline_keyboard_menu, one_food_inline_button, send_cancel_food
-from database import get_specific_food, add_to_table, get_users, change_table, get_user_order
+from database import get_specific_food, add_to_table, get_users, change_table, get_user_order, add_comment
+
+class AddComment(StatesGroup):
+    comment = State()
 
 
 action_router = Router()
 
+@action_router.callback_query(F.data == 'main')
 @action_router.callback_query(F.data.in_(['action',]))
 async def start_action(callback:CallbackQuery):
     await callback.message.answer(
@@ -121,25 +125,61 @@ async def back_to_menu(callback: CallbackQuery):
 async def user_orders(message: Message):
     user_orders = get_user_order(message.from_user.id)
 
-    for order in user_orders:
-        order_id, food_name, user_id, food_price, order_quantity, total_price, status, created_at = order
+    if user_orders:
+        for order in user_orders:
+            order_id, food_name, user_id, food_price, order_quantity, total_price, status, created_at = order
 
-        text = (
-            f"📌 Buyurtma ID: {order_id}\n"
-            f"🍽 Taom: {food_name}\n"
-            f"💵 Narxi: {food_price:,} so'm\n"
-            f"📦 Soni: {order_quantity} ta\n"
-            f"💰 Umumiy: {total_price:,} so'm\n"
-            f"📅 Sana: {created_at}\n"
-            f"📊 Holat: {status}\n"
+            text = (
+                f"📌 Buyurtma ID: {order_id}\n"
+                f"🍽 Taom: {food_name}\n"
+                f"💵 Narxi: {food_price:,} so'm\n"
+                f"📦 Soni: {order_quantity} ta\n"
+                f"💰 Umumiy: {total_price:,} so'm\n"
+                f"📅 Sana: {created_at}\n"
+                f"📊 Holat: {status}\n"
+            )
+
+            await message.answer(text=text)
+            
+    else:
+        await message.answer(
+            text = """📭 Sizning buyurtmalaringiz ro‘yxati hozircha bo‘sh.  
+
+🍔 Iltimos, ovqatlardan birini tanlab buyurtma qiling!
+""",
+            reply_markup=action_kb
         )
 
-        await message.answer(text=text)
-
         
+@action_router.message(F.text == "Aloqa")
+async def get_comment_from_user(message:Message, state:FSMContext):
+    await state.set_state(AddComment.comment)
+    await message.answer(
+        text = "📩 *Aloqa bo‘limi*\n\n"
+            "Adminlar bilan bog‘lanish uchun quyidagi ma’lumotlardan foydalanishingiz mumkin:\n"
+            "👤 Admin: @muhammadibrohimovceo\n"
+            "📞 Telefon: +998 88 008 45 06\n\n"
+            "✍️ Shu yerga o‘z fikr-mulohazalaringiz yoki savollaringizni yozib qoldiring: "
+    )
+    
+@action_router.message(AddComment.comment)
+async def get_comment(message:Message, state:FSMContext):
+    comment = message.text
+    await state.update_data(comment = comment)
+    comment = await state.get_data()
+    await state.clear()
+    
+    add_comment(message.from_user.id, comment)
+    
+    await message.answer(
+        text = "Rahmat, adminlarimizga yetkazildi\n\nIltimos kerakli tugmani tanlang:",
+        reply_markup=action_kb
+    )
+    
+    
+    
 
 
-
-# @action_router.message()
+# to@action_router.message()
 # async def nothng(message:Message):
 #     await message.answer(f"{message.from_user.id}")

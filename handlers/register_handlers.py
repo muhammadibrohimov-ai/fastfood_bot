@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
@@ -102,9 +102,14 @@ async def get_location(message:Message, state:FSMContext):
 
         if add_to_table('users', chat_id=data['chat_id'], username = data['username'], fullname=data['fullname'], long = data['long'], lat = data['lat'], is_admin = 'true' if str(message.from_user.id) == str(ADMIN_ID) else 'false', phone = data['phone'], location_link = data['location_link']):
             await message.answer(
-                text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}\n\n{maps_url}",
+                text="✅ Siz muvaffaqiyatli ro'yxatdan o'tdingiz!",
+                reply_markup=ReplyKeyboardRemove()
+                )
+
+            await message.answer(
+                text="Iltimos asosiy menuga qayting",
                 reply_markup=action_ikb
-            )
+                )
         else:
             await message.answer(
                 text = 'Xatolik yuz berdi , iltimos qayta urining!',

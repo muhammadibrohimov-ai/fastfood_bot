@@ -6,7 +6,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 from .buttons import admin_kb, registered_kb, add_foods, inline_keyboard_foods, order_show, order_inline_kb
 
-from database import add_to_table, get_order_food, change_table
+from database import add_to_table, get_order_food, change_table, get_foods
 
 from environs import Env
 env = Env()
@@ -24,7 +24,6 @@ class Register_food(StatesGroup):
     quantity = State()
     
 class Edit_food(StatesGroup):
-    start = State()
     feature = State()
 
 @admin_router.message(Command("admin"))
@@ -35,7 +34,7 @@ async def start_admin(message:Message):
             text = 
             "🎛 <b>Admin Panel</b> ga xush kelibsiz!\n\n"
         "Quyidagi bo‘limlardan birini tanlang:\n\n"
-        "🍽 Taom qo‘shish\n"
+        "🍽 Taomlar\n"
         "🛒 Buyurtmalar\n"
         "💬 Xabarlar\n"
         "👤 User panelga qaytish",
@@ -43,33 +42,26 @@ async def start_admin(message:Message):
         )
     else:
         await message.answer(
-            text = "Siz admin emasssiz, iltimos kerakli tugmani tanlang: ",
+            text = "Siz 🎛admin emasssiz, iltimos kerakli tugmani tanlang: ",
             reply_markup=registered_kb
         )
         
-@admin_router.message(F.text == 'Taom qo\'shish')
+@admin_router.message(F.text == 'Taomlar')
 async def add_food(message:Message):
         await message.answer(
             text = "Quyidagilardan birini tanlang: ",
             reply_markup=add_foods
         )
     
-@admin_router.callback_query(F.data.endswith('food'))
+@admin_router.callback_query(F.data.startswith('new'))
 async def choose_which(callback:CallbackQuery, state:FSMContext):
-    if callback.data.split('_')[0] == 'new':
-        await state.set_state(Register_food.name)
-        await callback.message.answer(
+    await state.set_state(Register_food.name)
+    await callback.message.answer(
             text = "Taom nomini kiring: "
         )
-        callback.answer()
+    callback.answer()
         
-    else:
-        await state.set_state(Edit_food.start)
-        await callback.message.answer(
-            text = "Iltimos kerakli taomini tanlang: ",
-            reply_markup=await inline_keyboard_foods()
-        )
-        callback.answer()
+        
 
 @admin_router.message(Register_food.name)
 async def get_new_food_name(message:Message, state:FSMContext):
@@ -126,6 +118,24 @@ async def get_new_food_quantity(message:Message, state:FSMContext):
             text = "Xatolik ketdi qayta urining\nQuyidagilardan birini tanlang: ",
             reply_markup=add_foods
         )
+        
+        
+        
+@admin_router.callback_query(F.data == "existing_food")
+async def start_editing_food(callback:CallbackQuery):
+    for food in get_foods():
+        text = (
+            f"🍽 Taom: {food[1]}\n"
+            f"💵 Narxi: {food[3]} so'm\n"
+            f"📦 Mavjud: {food[4]} ta\n"
+            f"ℹ️ Tavsif: {food[5]}"
+        )
+        await callback.message.answer_photo(
+            photo=food[2],
+            caption=text,
+            reply_markup = await inline_keyboard_foods(food[0])
+        )
+        
         
 @admin_router.message(F.text == "Buyurtmalar")
 async def show_orders(message:Message):
