@@ -6,7 +6,7 @@ from aiogram.fsm.state import StatesGroup, State
 
 from .buttons import admin_kb, registered_kb, add_foods, inline_keyboard_foods, order_show, order_inline_kb
 
-from database import add_to_table, get_order_food, change_table, get_foods, get_comments, get_users
+from database import add_to_table, get_order_food, change_table, get_foods, get_comments
 
 from environs import Env
 env = Env()
@@ -313,21 +313,6 @@ async def show_comments(message: Message):
 
         
 
-@admin_router.message(F.text == "Foydalanuvchilar")
-async def show_users(message: Message):
-    users = get_users()  # Ma'lumotlar bazasidan foydalanuvchilarni olish
-    if not users:
-        await message.answer("❌ Hali foydalanuvchilar ro'yxati mavjud emas", reply_markup=admin_kb)
-        return
 
-    for user in users:
-        user_id, name, phone, created_at = user  # Ma'lumotlar bazasidan qaytgan ustunlar
-        text = (
-            f"🆔 <b>Foydalanuvchi ID:</b> {user_id}\n"
-            f"👤 <b>Ism:</b> {name}\n"
-            f"📞 <b>Telefon:</b> {phone}\n"
-            f"📅 <b>Ro'yxatdan o'tgan sana:</b> {created_at}\n"
-        )
-        await message.answer(text, parse_mode="HTML", reply_markup=admin_kb)
 
     
