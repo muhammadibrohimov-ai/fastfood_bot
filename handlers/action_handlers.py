@@ -11,7 +11,9 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from .buttons import action_kb, inline_keyboard_menu, one_food_inline_button, send_cancel_food
+from .check import check_phone, location_check
+
+from .buttons import action_kb, inline_keyboard_menu, one_food_inline_button, send_cancel_food, settings, phone_kb, location_kb
 from database import get_specific_food, add_to_table, get_users, change_table, get_user_order, add_comment
 
 class AddComment(StatesGroup):
@@ -19,6 +21,7 @@ class AddComment(StatesGroup):
 
 
 action_router = Router()
+
 
 @action_router.callback_query(F.data == 'main')
 @action_router.callback_query(F.data.in_(['action',]))
@@ -99,6 +102,8 @@ async def send_to_db(callback:CallbackQuery):
     if add_to_table('orders', food_id = food_id, user_id = user_id, quantity = quantity, price = str(food[3]), status = 'new'):
         await callback.message.delete()
         
+        change_table(f"UPDATE foods SET quantity = (quantity - {quantity}) WHERE id = {food_id};")
+        
         await callback.message.answer(
             text="Success!!!\nIltimos kerakli buyruqni tanlang:",
             reply_markup=action_kb
@@ -163,23 +168,36 @@ async def get_comment_from_user(message:Message, state:FSMContext):
     )
     
 @action_router.message(AddComment.comment)
-async def get_comment(message:Message, state:FSMContext):
+async def get_comment(message: Message, state: FSMContext):
     comment = message.text
-    await state.update_data(comment = comment)
-    comment = await state.get_data()
     await state.clear()
     
     add_comment(message.from_user.id, comment)
     
     await message.answer(
-        text = "Rahmat, adminlarimizga yetkazildi\n\nIltimos kerakli tugmani tanlang:",
+        text = "✅ Rahmat, adminlarimizga yetkazildi!\n\nIltimos, kerakli tugmani tanlang:",
         reply_markup=action_kb
     )
     
     
     
 
-
-# to@action_router.message()
-# async def nothng(message:Message):
-#     await message.answer(f"{message.from_user.id}")
+@action_router.message()
+@action_router.message(Command("help"))
+@action_router.message(F.text.in_(["Elp", "Yordam", "Help"]))
+async def show_help(message: Message):
+    help_text = (
+        "🆘 <b>Yordam bo‘limi</b>\n\n"
+        "Quyidagi komandalar orqali botdan foydalanishingiz mumkin:\n\n"
+        "👤 <b>Ro‘yxatdan o‘tish:</b>\n"
+        "▫️ Register — ro‘yxatdan o‘tish\n\n"
+        "🍔 <b>Buyurtma berish:</b>\n"
+        "▫️ Menu yoki /start — menyuni ko‘rish\n"
+        "▫️ Buyurtmalarim — buyurtmalaringizni ko‘rish\n\n"
+        "📞 <b>Aloqa:</b>\n"
+        "▫️ Aloqa — admin bilan bog‘lanish\n\n"
+        "🎛 <b>Admin komandalar:</b>\n"
+        "▫️ /admin — admin panelga kirish\n\n"
+        "ℹ️ Maslahat: komandani /help yozib yuborsangiz, shu oynani qayta ochasiz."
+    )
+    await message.answer(help_text, parse_mode="HTML", disable_web_page_preview=True, reply_markup=action_kb)

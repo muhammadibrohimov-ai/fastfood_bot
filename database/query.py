@@ -81,11 +81,30 @@ def add_comment(chat_id, comment):
     try:
         with get_connection() as db:
             dbc = db.cursor()
-            dbc.execute("INSERT INTO comments (chat_id, coment) VALUES (?, ?)", (str(chat_id), str(comment)))
+            dbc.execute(
+                "INSERT INTO comments (chat_id, comment) VALUES (?, ?)",
+                (str(chat_id), comment if isinstance(comment, str) else str(comment))
+            )
+
             
             db.commit()
             
         return True
+    
+    except Exception as e:
+        print(e)
+        return False
+    
+    
+def get_comments():
+    try:
+        with get_connection() as db:
+            dbc = db.cursor()
+            dbc.execute("SELECT * FROM comments")
+            
+            data = dbc.fetchall()
+            
+        return data
     
     except Exception as e:
         print(e)

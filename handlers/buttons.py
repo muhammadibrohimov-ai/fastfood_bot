@@ -25,7 +25,7 @@ registered_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text = "Menu")],
         [KeyboardButton(text = "Buyurtmalarim")],
         [KeyboardButton(text = "Aloqa")],
-        [KeyboardButton(text = "Sozlamalar")]
+        [KeyboardButton(text = "Admin panelga o'tish")]
     ],
     resize_keyboard=True,
     one_time_keyboard=True
@@ -58,7 +58,7 @@ action_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text="Menu")],
         [KeyboardButton(text="Buyurtmalarim")],
         [KeyboardButton(text="Aloqa")],
-        [KeyboardButton(text='Sozlamalar')]
+        [KeyboardButton(text = "Admin panelga o'tish")]
     ],
     resize_keyboard=True,
     one_time_keyboard=True,
@@ -130,11 +130,12 @@ add_foods = InlineKeyboardMarkup(
 )
 
 async def inline_keyboard_foods(food_id):
-    features = ['name', 'price', 'image', 'quantity', 'description']
+    features = ['name', 'price', 'image', 'quantity', 'description',"❌Delete"]
     keyboard = InlineKeyboardBuilder()
     
     for i in features:
         keyboard.add(InlineKeyboardButton(text = i, callback_data=f'edit_{food_id}_{features.index(i)}'))
+    
         
     return keyboard.adjust(2).as_markup()
 
@@ -163,3 +164,15 @@ async def order_inline_kb(order_id:int, i:int = 1):
             ]
         ]
     )
+    
+    
+settings = ReplyKeyboardMarkup(
+            keyboard=[
+                [KeyboardButton(text="Ismni o'zgartirish")],
+                [KeyboardButton(text="Telefon raqamni o'zgartirish")],
+                [KeyboardButton(text="Joylashuvni o'zgartirish")],
+                [KeyboardButton(text="🔙 Ortga")],
+            ],
+            resize_keyboard=True,
+            one_time_keyboard=True
+        )
