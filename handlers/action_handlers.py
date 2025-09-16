@@ -12,7 +12,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 from .buttons import action_kb, inline_keyboard_menu, one_food_inline_button, send_cancel_food
-from database import get_specific_food, add_to_table, get_users, change_table
+from database import get_specific_food, add_to_table, get_users, change_table, get_user_order
 
 
 action_router = Router()
@@ -117,7 +117,27 @@ async def back_to_menu(callback: CallbackQuery):
 
     await callback.message.edit_reply_markup(reply_markup=await inline_keyboard_menu())
    
-   
+@action_router.message(F.text == 'Buyurtmalarim')
+async def user_orders(message: Message):
+    user_orders = get_user_order(message.from_user.id)
+
+    for order in user_orders:
+        order_id, food_name, user_id, food_price, order_quantity, total_price, status, created_at = order
+
+        text = (
+            f"📌 Buyurtma ID: {order_id}\n"
+            f"🍽 Taom: {food_name}\n"
+            f"💵 Narxi: {food_price:,} so'm\n"
+            f"📦 Soni: {order_quantity} ta\n"
+            f"💰 Umumiy: {total_price:,} so'm\n"
+            f"📅 Sana: {created_at}\n"
+            f"📊 Holat: {status}\n"
+        )
+
+        await message.answer(text=text)
+
+        
+
 
 
 # @action_router.message()

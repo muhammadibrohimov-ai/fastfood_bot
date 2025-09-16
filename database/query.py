@@ -63,3 +63,16 @@ def get_order_food(status : str):
         print(e)
         return None
 
+def get_user_order(user_id:int):
+    try:
+        with get_connection() as db:
+            dbc = db.cursor()
+            dbc.execute(f"SELECT o.id AS order_id, f.name AS food_name, u.id AS user_id, f.price AS food_price, o.quantity AS order_quantity, (o.quantity * f.price) AS total_price, o.status, o.created_at FROM orders o JOIN foods f ON o.food_id = f.id JOIN users u ON o.user_id = u.id WHERE u.chat_id = {user_id};")
+            data = dbc.fetchall()
+    
+        return data
+            
+    except Exception as e:
+        print(e)
+        return None
+        

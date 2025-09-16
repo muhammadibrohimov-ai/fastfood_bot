@@ -32,7 +32,13 @@ async def start_admin(message:Message):
     id = str(message.from_user.id)
     if str(ADMIN_ID) == id:
         await message.answer(
-            text = "Admin Paneliga xush kelibsiz!\nKerakli tugamni tanlang: ",
+            text = 
+            "🎛 <b>Admin Panel</b> ga xush kelibsiz!\n\n"
+        "Quyidagi bo‘limlardan birini tanlang:\n\n"
+        "🍽 Taom qo‘shish\n"
+        "🛒 Buyurtmalar\n"
+        "💬 Xabarlar\n"
+        "👤 User panelga qaytish",
             reply_markup=admin_kb
         )
     else:

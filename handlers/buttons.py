@@ -23,7 +23,7 @@ register_kb = ReplyKeyboardMarkup(
 registered_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text = "Menu")],
-        [KeyboardButton(text = "Buyurtma")],
+        [KeyboardButton(text = "Buyurtmalarim")],
         [KeyboardButton(text = "Aloqa")],
         [KeyboardButton(text = "Sozlamalar")]
     ],
@@ -56,7 +56,7 @@ action_ikb = InlineKeyboardMarkup(
 action_kb = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Menu")],
-        [KeyboardButton(text="Buyurtmalar")],
+        [KeyboardButton(text="Buyurtmalarim")],
         [KeyboardButton(text="Aloqa")],
         [KeyboardButton(text='Sozlamalar')]
     ],
@@ -120,7 +120,7 @@ add_foods = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text = "Yangi taom qo'shish", callback_data="new_food"), 
-            InlineKeyboardButton(text = 'Mavjud taomni qo\'shish', callback_data="existing_food")
+            InlineKeyboardButton(text = 'Mavjud taomni o\'zgartirish', callback_data="existing_food")
         ]
     ]
 )
@@ -139,6 +139,9 @@ order_show = ReplyKeyboardMarkup(
             KeyboardButton(text = "🆕New"),
             KeyboardButton(text = "In progress"),
             KeyboardButton(text = "Finished")
+        ],
+        [
+            KeyboardButton(text = "Back")  
         ]
     ], 
     resize_keyboard=True,

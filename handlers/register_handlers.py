@@ -76,8 +76,9 @@ async def get_location(message:Message, state:FSMContext):
         status_1 = False
     
     try:
-            long = message.location.longitude
-            lat = message.location.latitude
+        long = message.location.longitude
+        lat = message.location.latitude
+        
     except:
         status_2 = False
     
@@ -91,12 +92,17 @@ async def get_location(message:Message, state:FSMContext):
     else:
         await state.update_data(long = long)
         await state.update_data(lat = lat)
+        maps_url = f"https://www.google.com/maps/search/?api=1&query={lat},{long}"
+
+        await state.update_data(location_link=maps_url)
+        
         data = await state.get_data()
         await state.clear()
-        
-        if add_to_table('users', chat_id=data['chat_id'], username = data['username'], fullname=data['fullname'], long = data['long'], lat = data['lat'], is_admin = 'true' if str(message.from_user.id) == str(ADMIN_ID) else 'false', phone = data['phone']):
+    
+
+        if add_to_table('users', chat_id=data['chat_id'], username = data['username'], fullname=data['fullname'], long = data['long'], lat = data['lat'], is_admin = 'true' if str(message.from_user.id) == str(ADMIN_ID) else 'false', phone = data['phone'], location_link = data['location_link']):
             await message.answer(
-                text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}",
+                text = f"Siz muvaffaqiyatli ro'yxatdan o'tdingiz!\n{data}\n\n{maps_url}",
                 reply_markup=action_ikb
             )
         else:

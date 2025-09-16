@@ -20,7 +20,7 @@ def get_connection():
     return sql.connect("fastfood.db",)
 
 users = """
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     chat_id  INTEGER UNIQUE,
     fullname VARCHAR(100) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE users (
 """
 
 foods = '''
-CREATE TABLE foods (
+CREATE TABLE IF NOT EXISTS foods (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     name        VARCHAR(200),
     image       VARCHAR(250),
@@ -47,7 +47,7 @@ CREATE TABLE foods (
 '''
 
 orders = '''
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     food_id    INTEGER NOT NULL,
     user_id    INTEGER NOT NULL,
@@ -60,7 +60,17 @@ CREATE TABLE orders (
 );
 '''
 
-# for table in [users, foods, orders]:
+comments = '''
+CREATE TABLE IF NOT EXISTS comments(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id    INTEGER NOT NULL,
+    comment    TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);'''
+
+
+# for table in [users, foods, orders, comments]:
 #     with get_connection() as db:
 #         dbc = db.cursor()
 #         dbc.execute(table)
