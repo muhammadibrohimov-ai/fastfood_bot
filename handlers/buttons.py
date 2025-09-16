@@ -114,6 +114,7 @@ admin_kb = ReplyKeyboardMarkup(
         [KeyboardButton(text = "Taomlar")],
         [KeyboardButton(text = "Buyurtmalar")],
         [KeyboardButton(text = "Xabarlar")],
+        [KeyboardButton(text = "Foydalanuvchilar")],
         [KeyboardButton(text = "User panelga qaytish")]
     ],
     resize_keyboard=True,
@@ -165,14 +166,4 @@ async def order_inline_kb(order_id:int, i:int = 1):
         ]
     )
     
-    
-settings = ReplyKeyboardMarkup(
-            keyboard=[
-                [KeyboardButton(text="Ismni o'zgartirish")],
-                [KeyboardButton(text="Telefon raqamni o'zgartirish")],
-                [KeyboardButton(text="Joylashuvni o'zgartirish")],
-                [KeyboardButton(text="🔙 Ortga")],
-            ],
-            resize_keyboard=True,
-            one_time_keyboard=True
-        )
+ 
