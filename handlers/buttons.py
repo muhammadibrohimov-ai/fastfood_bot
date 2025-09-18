@@ -22,13 +22,12 @@ register_kb = ReplyKeyboardMarkup(
 
 registered_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text = "Menu")],
-        [KeyboardButton(text = "Buyurtmalarim")],
-        [KeyboardButton(text = "Aloqa")],
+        [KeyboardButton(text="Menu"), KeyboardButton(text="Buyurtmalarim")],
+        [KeyboardButton(text="Aloqa"), KeyboardButton(text = "Sozlamalar")],
         [KeyboardButton(text = "Admin panelga o'tish")]
     ],
     resize_keyboard=True,
-    one_time_keyboard=True
+    one_time_keyboard=True,
 )
 
 phone_kb = ReplyKeyboardMarkup(
@@ -55,9 +54,8 @@ action_ikb = InlineKeyboardMarkup(
 
 action_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Menu")],
-        [KeyboardButton(text="Buyurtmalarim")],
-        [KeyboardButton(text="Aloqa")],
+        [KeyboardButton(text="Menu"), KeyboardButton(text="Buyurtmalarim")],
+        [KeyboardButton(text="Aloqa"), KeyboardButton(text = "Sozlamalar")],
         [KeyboardButton(text = "Admin panelga o'tish")]
     ],
     resize_keyboard=True,
@@ -111,9 +109,8 @@ async def send_cancel_food(quantity, food_id):
 
 admin_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text = "Taomlar")],
-        [KeyboardButton(text = "Buyurtmalar")],
-        [KeyboardButton(text = "Xabarlar")],
+        [KeyboardButton(text = "Taomlar"), KeyboardButton(text = "Buyurtmalar")],
+        [KeyboardButton(text = "Xabarlar"),KeyboardButton(text = "Foydalanuvchilar")],
         [KeyboardButton(text = "User panelga qaytish")]
     ],
     resize_keyboard=True,
@@ -122,11 +119,18 @@ admin_kb = ReplyKeyboardMarkup(
 
 add_foods = InlineKeyboardMarkup(
     inline_keyboard=[
-        [
-            InlineKeyboardButton(text = "Yangi taom qo'shish", callback_data="new_food"), 
-            InlineKeyboardButton(text = 'Mavjud taomni o\'zgartirish', callback_data="existing_food")
-        ]
+        [InlineKeyboardButton(text = "Yangi taom qo'shish", callback_data="new_food")],
+        [InlineKeyboardButton(text = 'Mavjud taomni o\'zgartirish', callback_data="existing_food")],
+        [InlineKeyboardButton(text = "Taomlar ro'yxati", callback_data ='show_foods')]
     ]
+)
+
+back_button = ReplyKeyboardMarkup(
+    keyboard = [
+        [KeyboardButton(text = 'Back')]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
 )
 
 async def inline_keyboard_foods(food_id):
@@ -144,7 +148,10 @@ order_show = ReplyKeyboardMarkup(
         [
             KeyboardButton(text = "🆕New"),
             KeyboardButton(text = "In progress"),
-            KeyboardButton(text = "Finished")
+        ],
+        [
+            KeyboardButton(text = "Finished"),
+            KeyboardButton(text = 'Canceled')    
         ],
         [
             KeyboardButton(text = "Back")  

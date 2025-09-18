@@ -77,8 +77,8 @@ for table in [users, foods, orders, comments]:
         db.commit() 
 
 
-with get_connection() as db:
-        dbc = db.cursor()
-        dbc.execute("DELETE FROM users")
-        db.commit() 
+# with get_connection() as db:
+#         dbc = db.cursor()
+#         dbc.execute("DELETE FROM users")
+#         db.commit() 
         

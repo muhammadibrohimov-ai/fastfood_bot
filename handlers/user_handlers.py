@@ -10,9 +10,11 @@ from database import get_users
 
 user_router = Router()
 
+@user_router.message(F.text == "🔙 Ortga")
 @user_router.message(F.text == "User panelga qaytish")
 @user_router.message(CommandStart())
 async def cmd_start(message:Message, state:FSMContext):
+    
     user = message.from_user
     data = get_users(user.id)
     if not data:

@@ -4,9 +4,9 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
-from .buttons import admin_kb, registered_kb, add_foods, inline_keyboard_foods, order_show, order_inline_kb
+from .buttons import admin_kb, registered_kb, add_foods, inline_keyboard_foods, order_show, order_inline_kb, back_button
 
-from database import add_to_table, get_order_food, change_table, get_foods, get_comments
+from database import add_to_table, get_order_food, change_table, get_foods, get_comments, get_all_users
 
 from environs import Env
 env = Env()
@@ -29,7 +29,8 @@ class Edit_food(StatesGroup):
 
 @admin_router.message(F.text == "Admin panelga o'tish")
 @admin_router.message(Command("admin"))
-async def start_admin(message:Message):
+async def start_admin(message:Message, state:FSMContext):
+    await state.clear()
     id = str(message.from_user.id)
     if str(ADMIN_ID) == id:
         await message.answer(
@@ -47,19 +48,235 @@ async def start_admin(message:Message):
             text = "Siz 🎛admin emasssiz, iltimos kerakli tugmani tanlang: ",
             reply_markup=registered_kb
         )
-        
+
+
+@admin_router.message(F.text == "Foydalanuvchilar")    
+async def show_all_users_admin(message: Message, state: FSMContext):
+    await state.clear()
+
+    users = get_all_users()
+    if not users:
+        await message.answer("📭 Hozircha foydalanuvchilar mavjud emas.")
+        return
+    
+    for i, user in enumerate(users, start=1):
+        user_id, chat_id, fullname, username, phone, long, lat, location_link, is_admin = user
+
+        text = (
+            f"{i}. 👤 *{fullname}*\n"
+            f"🆔 Chat ID: `{chat_id}`\n"
+            f"🔗 Username: @{username}\n"
+            f"📞 Telefon: {phone if phone else '❌ yo‘q'}\n"
+            f"📍 Location: {location_link if location_link else '❌ yo‘q'}\n"
+            f"👑 Admin: {'✅' if is_admin else '❌'}"
+        )
+
+        await message.answer(text, parse_mode="Markdown")
+
+
+    
+
+
 @admin_router.message(F.text == 'Taomlar')
-async def add_food(message:Message):
+async def add_food(message:Message, state:FSMContext):
+        await state.clear()
         await message.answer(
             text = "Quyidagilardan birini tanlang: ",
             reply_markup=add_foods
         )
+ 
     
+
+@admin_router.message(F.text == 'Back')
+async def get_back(message:Message, state:FSMContext):
+    
+    await state.clear()
+    
+    await message.answer(
+        text = "Admin panelining asosiy oynasihga qaytdingiz!\n",
+        reply_markup=admin_kb
+    )
+
+
+# Comments
+        
+@admin_router.message(F.text == "Xabarlar")
+async def show_comments(message: Message, state:FSMContext):
+    
+    await state.clear()
+    
+    comments = get_comments()
+    if not comments:
+        await message.answer("❌ Hali izohlar yo‘q", reply_markup=admin_kb)
+        return
+    
+    for row in comments:
+        comment_id, chat_id, comment, created_at = row
+        
+        text = (
+            f"🆔 {comment_id}\n"
+            f"👤 Chat ID: {chat_id}\n"
+            f"💬 Izoh:\n\n{comment}\n\n"
+            f"📅 Sana: {created_at}\n\n"
+        )
+        
+        await message.answer(text, reply_markup=admin_kb)
+
+# Orders
+   
+@admin_router.message(F.text == "Buyurtmalar")
+async def show_orders(message:Message, state:FSMContext):
+    
+    await state.clear()
+    
+    await message.answer(
+        text = 'Qanday turdagi buyurtmalarni ko\'rmoqchisiz, kerakli tugmani bosing: ',
+        reply_markup=order_show
+    )
+    
+    
+@admin_router.message(F.text == "🆕New")
+async def show_new_order(message:Message, state:FSMContext):
+    
+    await state.clear()
+    
+    foods = get_order_food(status='new')
+    if foods:
+        for i in foods:
+            order_id, food_name, user_id, food_price, order_quantity, total_price = i
+            await message.answer(
+                text = f'🍽 Taom: {food_name}\n💵 Narxi: {food_price:,} so\'m\n📦 Soni: {order_quantity}\n💵 Umumiy: {total_price:,} so\'m\n',
+                reply_markup=await order_inline_kb(order_id)
+            )    
+            
+    else:
+        await message.answer(
+            text = "Afsuski bunday turdagi buyurtmalar mavjud emas!!",
+            reply_markup=admin_kb
+        )
+        
+@admin_router.message(F.text == "In progress")
+async def show_progress_order(message:Message, state:FSMContext):
+    
+    await state.clear()
+    
+    foods = get_order_food(status='in_progress')
+    if foods: 
+        for i in foods:
+            order_id, food_name, user_id, food_price, order_quantity, total_price = i
+            await message.answer(
+                text = f'🍽 Taom: {food_name}\n💵 Narxi: {food_price:,} so\'m\n📦 Soni: {order_quantity}\n💵 Umumiy: {total_price:,} so\'m\n',
+                reply_markup=await order_inline_kb(order_id, 2)
+            )  
+            
+    else:
+        await message.answer(
+            text = "Afsuski bunday turdagi buyurtmalar mavjud emas!!",
+            reply_markup=admin_kb
+        )  
+            
+@admin_router.message(F.text == "Finished")
+async def show_progress_order(message:Message, state:FSMContext):
+    
+    await state.clear()
+    
+    foods = get_order_food(status='finished')
+    
+    if foods:
+        for i in foods:
+            order_id, food_name, user_id, food_price, order_quantity, total_price = i
+            await message.answer(
+                text = f'🍽 Taom: {food_name}\n💵 Narxi: {food_price:,} so\'m\n📦 Soni: {order_quantity}\n💵 Umumiy: {total_price:,} so\'m\n',
+                reply_markup=await order_inline_kb(order_id, 2)
+            )    
+        
+    else:
+        await message.answer(
+            text = "Afsuski bunday turdagi buyurtmalar mavjud emas!!",
+            reply_markup=admin_kb
+        )
+        
+
+@admin_router.message(F.text == "Canceled")
+async def show_progress_order(message:Message, state:FSMContext):
+    
+    await state.clear()
+    
+    foods = get_order_food(status='cancel')
+    
+    if foods:
+        for i in foods:
+            order_id, food_name, user_id, food_price, order_quantity, total_price = i
+            await message.answer(
+                text = f'🍽 Taom: {food_name}\n💵 Narxi: {food_price:,} so\'m\n📦 Soni: {order_quantity}\n💵 Umumiy: {total_price:,} so\'m\n',
+                reply_markup=await order_inline_kb(order_id, 2)
+            )    
+        
+    else:
+        await message.answer(
+            text = "Afsuski bunday turdagi buyurtmalar mavjud emas!!",
+            reply_markup=admin_kb
+        )
+
+@admin_router.callback_query(F.data.startswith(('progress', 'finish')))
+async def change_order(callback:CallbackQuery, state:FSMContext):
+    
+    await state.clear()
+    
+    status = callback.data.split('_')[0]
+    order_id = callback.data.split('_')[1]
+    print(order_id)
+    if change_table("UPDATE orders SET status = '%s' WHERE id = %s"%('finished' if status == 'finish' else 'in_progress', order_id)):
+        await callback.message.edit_reply_markup(reply_markup=None)
+        await callback.message.edit_text(text = 'Success')
+        
+        
+        
+@admin_router.callback_query(F.data.startswith('cancel'))
+async def change_order(callback:CallbackQuery, state:FSMContext):
+    
+    await state.clear()
+    
+    status = callback.data.split('_')[0]
+    order_id = callback.data.split('_')[1]
+    print(order_id)
+    if change_table(f"UPDATE orders SET status = '{status}' WHERE id = {order_id}"):
+        await callback.message.edit_reply_markup(reply_markup=None)
+        await callback.message.edit_text(text = 'Success')
+
+
+
+# Foods
+
+   
+@admin_router.callback_query(F.data == "show_foods")   
+async def show_all_foods_admin(callback:CallbackQuery):
+    if get_foods():
+        for food in get_foods():
+            text = (
+                f"🍽 Taom: {food[1]}\n"
+                f"💵 Narxi: {food[3]} so'm\n"
+                f"📦 Mavjud: {food[4]} ta\n"
+                f"ℹ️ Tavsif: {food[5]}"
+            )
+            await callback.message.answer_photo(
+                photo=food[2],
+                caption=text,
+                reply_markup = back_button
+            )
+            
+    else:
+        await callback.message.answer(
+            text = 'Afsuski hozirda taom mavjud emas!\nIltimos yangi taom qoshing',
+            reply_markup=add_foods
+        )
+
+   
 @admin_router.callback_query(F.data.startswith('new'))
 async def choose_which(callback:CallbackQuery, state:FSMContext):
     await state.set_state(Register_food.name)
     await callback.message.answer(
-            text = "Taom nomini kiring: "
+            text = "🥘 Taom nomini kiring: "
         )
     callback.answer()
         
@@ -70,14 +287,14 @@ async def get_new_food_name(message:Message, state:FSMContext):
     await state.update_data(name = message.text)
     await state.set_state(Register_food.image)    
     await message.answer(
-        text = "Iltimos taomning rasmini jo'nating"
+        text = "🌁 Iltimos taomning rasmini jo'nating"
     )
     
 @admin_router.message(Register_food.image)
 async def get_new_food_image(message:Message, state:FSMContext):
     if not message.photo:
         await message.answer(
-            text = "Iltimos taomning qayta rasmini jo'nating"
+            text = "🌁 Iltimos taomning qayta rasmini jo'nating"
         ) 
     
     else:
@@ -85,7 +302,7 @@ async def get_new_food_image(message:Message, state:FSMContext):
         await state.update_data(image = photo_id)
         await state.set_state(Register_food.decription)
         await message.answer(
-            text = f'{photo_id}\nIltimos taomga sharh yozing: '
+            text = f'📝 Iltimos taomga izoh yozing: '
         )
         
 @admin_router.message(Register_food.decription)
@@ -93,14 +310,14 @@ async def get_description(message:Message, state:FSMContext):
     text = message.text
     await state.update_data(description = text)
     await state.set_state(Register_food.price)
-    await message.answer("Iltimos taomning narxini kiritng: ")
+    await message.answer("💰 Iltimos taomning narxini kiritng: ")
         
 @admin_router.message(Register_food.price)
 async def get_new_food_price(message:Message, state:FSMContext):
     await state.update_data(price = message.text)
     await state.set_state(Register_food.quantity)
     await message.answer(
-        text = 'Iltimos taomning miqdorini kiritng: '
+        text = '🛒 Iltimos taomning miqdorini kiritng: '
     )
     
 
@@ -111,7 +328,7 @@ async def get_new_food_quantity(message:Message, state:FSMContext):
     await state.clear()
     if add_to_table('foods', name = data['name'], price = data['price'], image = data['image'], quantity = data['quantity'], description = data['description']):
         await message.answer(
-            text = f"Taom database ga qo'shildi!\n{data}",
+            text = f"🥳 Taom database ga qo'shildi!\n",
             reply_markup=admin_kb
         )
         
@@ -125,6 +342,8 @@ async def get_new_food_quantity(message:Message, state:FSMContext):
         
 @admin_router.callback_query(F.data == "existing_food")
 async def start_editing_food(callback:CallbackQuery, state:FSMContext):
+    
+    await state.clear()
     
     await callback.answer(
         text = "Siz uchun kerakli bo'lgan taomning kerakli narsanini o'zgartiring: "
@@ -203,113 +422,6 @@ async def get_feature(message:Message, state:FSMContext):
     )
     
 
-
-@admin_router.message(F.text == 'Back')
-async def get_back(message:Message):
-    await message.answer(
-        text = "Admin oanelning asosiy oynasihga qaytdingiz!\n",
-        reply_markup=admin_kb
-    )
-
-
-        
-@admin_router.message(F.text == "Buyurtmalar")
-async def show_orders(message:Message):
-    await message.answer(
-        text = 'Qanday turdagi buyurtmalarni ko\'rmoqchisiz, kerakli tugmani bosing: ',
-        reply_markup=order_show
-    )
-    
-    
-@admin_router.message(F.text == "🆕New")
-async def show_new_order(message:Message):
-    foods = get_order_food(status='new')
-    if foods:
-        for i in foods:
-            order_id, food_name, user_id, food_price, order_quantity, total_price = i
-            await message.answer(
-                text = f'🍽 Taom: {food_name}\n💵 Narxi: {food_price:,} so\'m\n📦 Soni: {order_quantity}\n💵 Umumiy: {total_price:,} so\'m\n',
-                reply_markup=await order_inline_kb(order_id)
-            )    
-            
-    else:
-        await message.answer(
-            text = "Afsuski bunday turdagi buyurtmalar mavjud emas!!",
-            reply_markup=admin_kb
-        )
-        
-@admin_router.message(F.text == "In progress")
-async def show_progress_order(message:Message):
-    foods = get_order_food(status='in_progress')
-    if foods: 
-        for i in foods:
-            order_id, food_name, user_id, food_price, order_quantity, total_price = i
-            await message.answer(
-                text = f'🍽 Taom: {food_name}\n💵 Narxi: {food_price:,} so\'m\n📦 Soni: {order_quantity}\n💵 Umumiy: {total_price:,} so\'m\n',
-                reply_markup=await order_inline_kb(order_id, 2)
-            )  
-            
-    else:
-        await message.answer(
-            text = "Afsuski bunday turdagi buyurtmalar mavjud emas!!",
-            reply_markup=admin_kb
-        )  
-            
-@admin_router.message(F.text == "Finished")
-async def show_progress_order(message:Message):
-    foods = get_order_food(status='finished')
-    
-    if foods:
-        for i in foods:
-            order_id, food_name, user_id, food_price, order_quantity, total_price = i
-            await message.answer(
-                text = f'🍽 Taom: {food_name}\n💵 Narxi: {food_price:,} so\'m\n📦 Soni: {order_quantity}\n💵 Umumiy: {total_price:,} so\'m\n',
-                reply_markup=await order_inline_kb(order_id, 2)
-            )    
-        
-    else:
-        await message.answer(
-            text = "Afsuski bunday turdagi buyurtmalar mavjud emas!!",
-            reply_markup=admin_kb
-        )
-
-@admin_router.callback_query(F.data.startswith(('progress', 'finish')))
-async def change_order(callback:CallbackQuery):
-    status = callback.data.split('_')[0]
-    order_id = callback.data.split('_')[1]
-    print(order_id)
-    if change_table("UPDATE orders SET status = '%s' WHERE id = %s"%('finished' if status == 'finish' else 'in_progress', order_id)):
-        await callback.message.edit_reply_markup(reply_markup=None)
-        await callback.message.edit_text(text = 'Success')
-        
-@admin_router.callback_query(F.data.startswith('cancel'))
-async def change_order(callback:CallbackQuery):
-    status = callback.data.split('_')[0]
-    order_id = callback.data.split('_')[1]
-    print(order_id)
-    if change_table(f"UPDATE orders SET status = '{status}' WHERE id = {order_id}"):
-        await callback.message.edit_reply_markup(reply_markup=None)
-        await callback.message.edit_text(text = 'Success')
-        
-        
-@admin_router.message(F.text == "Xabarlar")
-async def show_comments(message: Message):
-    comments = get_comments()
-    if not comments:
-        await message.answer("❌ Hali izohlar yo‘q", reply_markup=admin_kb)
-        return
-    
-    for row in comments:
-        comment_id, chat_id, comment, created_at = row
-        
-        text = (
-            f"🆔 {comment_id}\n"
-            f"👤 Chat ID: {chat_id}\n"
-            f"💬 Izoh:\n\n{comment}\n\n"
-            f"📅 Sana: {created_at}\n\n"
-        )
-        
-        await message.answer(text, reply_markup=admin_kb)
 
         
 

@@ -31,3 +31,5 @@ logs/
 # Configuration files with sensitive information (e.g., API tokens, secrets)
 config.py
 settings.py
+
+.env

@@ -6,6 +6,13 @@ def get_users(chat_id):
         query = f"SELECT * FROM users WHERE chat_id = {chat_id}"
         dbc.execute(query)
         return dbc.fetchone()
+    
+def get_all_users():
+    with get_connection() as db:
+        dbc = db.cursor()
+        query = f"SELECT * FROM users;"
+        dbc.execute(query)
+        return dbc.fetchall()
 
 def add_to_table(table_name, **kwargs):
     keys = ', '.join(kwargs.keys())
