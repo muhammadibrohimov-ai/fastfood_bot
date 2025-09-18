@@ -1,35 +1,29 @@
-# Byte-compiled / optimized / compiled files
+# Python cache
 __pycache__/
-*.pyc
-*.pyd
+*.py[cod]
 *.pyo
+*.pyd
+*.so
 
 # Virtual environment
 venv/
-.venv/
-env/
 .env/
+*.env
 
-# Editor-specific files
+# Database files
+# *.db
+*.sqlite3
+
+# Logs
+*.log
+
+# IDE/editor files
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Operating System files
+# MacOS
 .DS_Store
-Thumbs.db
 
-# Logs and temporary files
-*.log
-*.tmp
-temp/
-logs/
-
-# Database files (if used locally, e.g., SQLite)
-# *.db
-# *.sqlite3
-
-# Configuration files with sensitive information (e.g., API tokens, secrets)
-config.py
-settings.py
-
-.env
+# Byte-compiled / optimized
